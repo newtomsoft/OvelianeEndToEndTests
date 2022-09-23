@@ -23,6 +23,8 @@ public class EndToEndTestsApplication
     {
         scraper.NavigateHomePage();
         scraper.WaitId("username").WriteInId("username", "a.goude");
+
+        Thread.Sleep(1000);
         scraper.WaitId("kc-form-buttons").Click("kc-form-buttons");
 
         Thread.Sleep(1000);
@@ -38,7 +40,6 @@ public class EndToEndTestsApplication
         scraper.ClickKeyValue("data-mat-icon-name", "compliance");
 
         //find element by text
-        scraper.ClickFirstXPathWithText("//mat-icon", "add");
 
     }
 }
