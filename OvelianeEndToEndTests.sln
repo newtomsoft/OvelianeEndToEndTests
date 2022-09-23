@@ -1,0 +1,31 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.3.32901.215
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "OvelianeEndToEndTests.Browser", "OvelianeEndToEndTests.Browser\OvelianeEndToEndTests.Browser.csproj", "{F1A25FB8-4216-47E3-A02C-8158DCE10E1C}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "OvelianeEndToEndTests.Share", "OvelianeEndToEndTests.Share\OvelianeEndToEndTests.Share.csproj", "{3EE557FA-C94C-4A5C-AC8C-665023D492BC}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{F1A25FB8-4216-47E3-A02C-8158DCE10E1C}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{F1A25FB8-4216-47E3-A02C-8158DCE10E1C}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{F1A25FB8-4216-47E3-A02C-8158DCE10E1C}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{F1A25FB8-4216-47E3-A02C-8158DCE10E1C}.Release|Any CPU.Build.0 = Release|Any CPU
+		{3EE557FA-C94C-4A5C-AC8C-665023D492BC}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{3EE557FA-C94C-4A5C-AC8C-665023D492BC}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{3EE557FA-C94C-4A5C-AC8C-665023D492BC}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{3EE557FA-C94C-4A5C-AC8C-665023D492BC}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {6249C37D-5DE3-460E-9B26-7F67A0B4333C}
+	EndGlobalSection
+EndGlobal
