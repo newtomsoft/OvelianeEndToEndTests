@@ -3,44 +3,44 @@
 public sealed class OvelianeScraper : IOvelianeScraper
 {
     private readonly ApplicationConfiguration _configuration;
-    private readonly IWebScraper _webScraper;
+    private readonly SeleniumScraper _scraper;
     private readonly ILogger<EndToEndTestsApplication> _logger;
 
 
-    public OvelianeScraper(IWebScraper webScraper, ApplicationConfiguration configuration, ILogger<EndToEndTestsApplication> logger)
+    public OvelianeScraper(SeleniumScraper scraper, ApplicationConfiguration configuration, ILogger<EndToEndTestsApplication> logger)
     {
-        _webScraper = webScraper;
+        _scraper = scraper;
         _configuration = configuration;
         _logger = logger;
     }
 
     public void NavigateHomePage()
     {
-        _webScraper.SetWindowSize(new Size(1600, 1000));
+        _scraper.SetWindowSize(new Size(1600, 1000));
 
         if (!string.IsNullOrEmpty(_configuration.ElementClassToFindInHomePage))
-            _webScraper.NavigateToPage(_configuration.WebsiteUrl, _configuration.ElementClassToFindInHomePage, "ClassName");
+            _scraper.NavigateToPage(_configuration.WebsiteUrl, _configuration.ElementClassToFindInHomePage, "ClassName");
         else
-            _webScraper.NavigateToPage(_configuration.WebsiteUrl, _configuration.ElementIdToFindInHomePage);
+            _scraper.NavigateToPage(_configuration.WebsiteUrl, _configuration.ElementIdToFindInHomePage);
     }
 
     public IOvelianeScraper Click(string id)
     {
-        if (string.IsNullOrEmpty(id) is not true) _webScraper.ClickId(id);
+        if (string.IsNullOrEmpty(id) is not true) _scraper.ClickId(id);
         return this;
     }
 
-    public void ClickKeyValue(string key, string value) => _webScraper.ClickKeyValue(key, value);
+    public void ClickKeyValue(string key, string value) => _scraper.ClickKeyValue(key, value);
 
     public IOvelianeScraper WriteInId(string id, string word)
     {
-        _webScraper.SendKeysToId(id, word);
+        _scraper.SendKeysToId(id, word);
         return this;
     }
 
     public IOvelianeScraper WaitId(string id)
     {
-        _webScraper.WaitId(id);
+        _scraper.WaitId(id);
         return this;
     }
 
@@ -53,6 +53,6 @@ public sealed class OvelianeScraper : IOvelianeScraper
 
     public void Toto()
     {
-        _webScraper.ClickFirstXPathWithText("span", "Checkpoints");
+        _scraper.ClickFirstXPathWithText("span", "Checkpoints");
     }
 }

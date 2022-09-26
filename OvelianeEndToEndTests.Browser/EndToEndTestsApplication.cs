@@ -2,20 +2,20 @@
 
 public class EndToEndTestsApplication
 {
+    private readonly IWebDriverFactory _webDriverFactory;
     private readonly ILogger<EndToEndTestsApplication> _logger;
-    private readonly IWebScraper _webScraper;
     private readonly ApplicationConfiguration _configuration;
 
-    public EndToEndTestsApplication(IWebScraper webScraper, ApplicationConfiguration configuration, ILogger<EndToEndTestsApplication> logger)
+    public EndToEndTestsApplication(IWebDriverFactory webDriverFactory, ApplicationConfiguration configuration, ILogger<EndToEndTestsApplication> logger)
     {
+        _webDriverFactory = webDriverFactory;
         _logger = logger;
-        _webScraper = webScraper;
         _configuration = configuration;
     }
 
     public void Run()
     {
-        var scraper = new OvelianeScraper.OvelianeScraper(_webScraper, _configuration, _logger);
+        var scraper = new OvelianeScraper.OvelianeScraper(new SeleniumScraper(_webDriverFactory, _logger), _configuration, _logger);
         PlayScenario1(scraper);
     }
 
@@ -39,6 +39,7 @@ public class EndToEndTestsApplication
         Thread.Sleep(1000);
         scraper.ClickKeyValue("data-mat-icon-name", "compliance");
 
+        scraper.ClickKeyValue("href", "/webapp/en/compliance/checkpoints");
         //find element by text
 
     }

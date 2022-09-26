@@ -11,7 +11,6 @@ var host = hostBuilder
     {
         services
             .AddOptions()
-            .AddSingleton<IWebScraper, SeleniumScraper>()
             .AddSingleton<EndToEndTestsApplication>()
             .AddSingleton<IWebDriverFactory, FirefoxDriverFactory>()
             .AddSingleton(applicationConfiguration);

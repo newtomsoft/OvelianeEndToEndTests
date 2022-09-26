@@ -1,6 +1,6 @@
-﻿namespace OvelianeEndToEndTests.Browser.Scraper;
+﻿namespace OvelianeEndToEndTests.Browser;
 
-public class SeleniumScraper : IWebScraper
+public class SeleniumScraper
 {
     private readonly ILogger<EndToEndTestsApplication> _logger;
     private readonly IWebDriver _webDriver;
@@ -71,7 +71,7 @@ public class SeleniumScraper : IWebScraper
             }
             catch
             {
-                Task.Delay(10).Wait();
+                Task.Delay(50).Wait();
             }
         }
     }
