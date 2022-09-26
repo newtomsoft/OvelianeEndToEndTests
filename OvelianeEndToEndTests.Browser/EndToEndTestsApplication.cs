@@ -19,7 +19,7 @@ public class EndToEndTestsApplication
         PlayScenario1(scraper);
     }
 
-    private static void PlayScenario1(IOvelianeScraper scraper)
+    private static void PlayScenario1(OvelianeScraper.OvelianeScraper scraper)
     {
         scraper.NavigateHomePage();
         scraper.WaitId("username").WriteInId("username", "a.goude");

@@ -1,6 +1,6 @@
 ﻿namespace OvelianeEndToEndTests.Browser.OvelianeScraper;
 
-public sealed class OvelianeScraper : IOvelianeScraper
+public sealed class OvelianeScraper
 {
     private readonly ApplicationConfiguration _configuration;
     private readonly SeleniumScraper _scraper;
@@ -24,7 +24,7 @@ public sealed class OvelianeScraper : IOvelianeScraper
             _scraper.NavigateToPage(_configuration.WebsiteUrl, _configuration.ElementIdToFindInHomePage);
     }
 
-    public IOvelianeScraper Click(string id)
+    public OvelianeScraper Click(string id)
     {
         if (string.IsNullOrEmpty(id) is not true) _scraper.ClickId(id);
         return this;
@@ -32,13 +32,13 @@ public sealed class OvelianeScraper : IOvelianeScraper
 
     public void ClickKeyValue(string key, string value) => _scraper.ClickKeyValue(key, value);
 
-    public IOvelianeScraper WriteInId(string id, string word)
+    public OvelianeScraper WriteInId(string id, string word)
     {
         _scraper.SendKeysToId(id, word);
         return this;
     }
 
-    public IOvelianeScraper WaitId(string id)
+    public OvelianeScraper WaitId(string id)
     {
         _scraper.WaitId(id);
         return this;

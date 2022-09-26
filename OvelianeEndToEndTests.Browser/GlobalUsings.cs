@@ -7,7 +7,6 @@ global using OpenQA.Selenium.Edge;
 global using OpenQA.Selenium.Firefox;
 global using OvelianeEndToEndTests.Browser;
 global using OvelianeEndToEndTests.Browser.Configuration;
-global using OvelianeEndToEndTests.Browser.OvelianeScraper;
 global using OvelianeEndToEndTests.Browser.WebDriverFactory;
 global using OvelianeEndToEndTests.Share;
 global using SeleniumAutomationUtils.Utils;
