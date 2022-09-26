@@ -21,17 +21,47 @@ public class SeleniumScraper
     }
 
     public void ClickFirstXPathWithText(string xPath, string text) => _webDriver.FindElements(By.XPath(xPath)).First(e => e.Text == text).Click();
-    public void ClickId(string id) => FindElement(_webDriver, By.Id(id), TimeSpan.FromSeconds(2))!.Click();
-    public void ClickClass(string className) => FindElement(_webDriver, By.ClassName(className), TimeSpan.FromSeconds(4))!.Click();
-    public void ClickKeyValue(string key, string value) => FindElement(_webDriver, By.CssSelector($"[{key}='{value}']"), TimeSpan.FromSeconds(4))!.Click();
+    public void ClickId(string id)
+    {
+        var element = new WebDriverWait(_webDriver, TimeSpan.FromSeconds(5)).Until(ExpectedConditions.ElementToBeClickable((By.Id(id))));
+        element.Click();
+    }
+
+    public void ClickClass(string className) => FindElement(_webDriver, By.ClassName(className), TimeSpan.FromSeconds(10))!.Click();
+    public void ClickAttributeValue(string attributeName, string attributeValue)
+    {
+        var element = FindElement(_webDriver, By.CssSelector($"[{attributeName}='{attributeValue}']"), TimeSpan.FromSeconds(10));
+        ClickElement(element!);
+    }
+
+    public void ClickTagText(string tag, string text)
+    {
+        var element = FindElement(_webDriver, By.XPath($"//{tag}[text()='{text}']"), TimeSpan.FromSeconds(4));
+        ClickElement(element!);
+    }
+
+    private static void ClickElement(IWebElement element)
+    {
+        try
+        {
+            element.Click();
+        }
+        catch
+        {
+            ClickElement(element.FindElement(By.XPath("./..")));
+        }
+    }
+
     public XmlDocument? GetClass(string className)
     {
         var element = FindElement(_webDriver, By.ClassName(className), TimeSpan.FromSeconds(4));
         return ConvertToXmlDocument(element);
     }
 
-    public void SendKeysToClass(string className, string keys) => FindElement(_webDriver, By.ClassName(className), TimeSpan.FromSeconds(2))!.SendKeys(keys);
-    public void SendKeysToId(string id, string keys) => FindElement(_webDriver, By.Id(id), TimeSpan.FromSeconds(2))!.SendKeys(keys);
+    public void WriteToClass(string className, string word) => FindElement(_webDriver, By.ClassName(className), TimeSpan.FromSeconds(2))!.SendKeys(word);
+    public void WriteToId(string id, string word) => FindElement(_webDriver, By.Id(id), TimeSpan.FromSeconds(2))!.SendKeys(word);
+    public void WriteAttributeValue(string attributeName, string attributeValue, string text) => FindElement(_webDriver, By.CssSelector($"[{attributeName}='{attributeValue}']"), TimeSpan.FromSeconds(2))!.SendKeys(text);
+
 
     public void WaitClass(string className) => FindElement(_webDriver, By.ClassName(className), TimeSpan.FromMinutes(2));
     public void WaitId(string id) => FindElement(_webDriver, By.Id(id), TimeSpan.FromMinutes(2));

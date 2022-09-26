@@ -15,21 +15,33 @@ public class EndToEndTestsApplication
 
     public void Run()
     {
-        var scraper = new OvelianeScraper.OvelianeScraper(new SeleniumScraper(_webDriverFactory, _logger), _configuration, _logger);
+        var scraper = new OvelianeScraper(new SeleniumScraper(_webDriverFactory, _logger), _configuration, _logger);
         PlayScenario1(scraper);
     }
 
-    private static void PlayScenario1(OvelianeScraper.OvelianeScraper scraper)
+    private static void PlayScenario1(OvelianeScraper scraper)
     {
+        //Home page + login
         scraper.NavigateHomePage();
         scraper.WaitId("username").WriteInId("username", "a.goude");
-        scraper.WaitId("kc-form-buttons").Click("kc-form-buttons");
+        scraper.WaitId("kc-form-buttons").ClickId("kc-form-buttons");
         scraper.Delay(1000).WaitId("password").WriteInId("password", "admin");
-        scraper.WaitId("kc-login").Click("kc-login");
-        scraper.Delay(1000).ClickKeyValue("data-mat-icon-name", "assets");
-        scraper.ClickKeyValue("data-mat-icon-name", "compliance");
-        scraper.ClickKeyValue("href", "/webapp/en/compliance/checkpoints");
-        //find element by text
+        scraper.WaitId("kc-login").ClickId("kc-login");
 
+        // ****************************
+        //compliance create checkpoint
+        // ****************************
+        scraper.ClickTagText("span", " Compliance ");
+        scraper.ClickTagText("span", "Checkpoints");
+        scraper.ClickTagText("span", "New Checkpoint");
+        scraper.WriteAttributeValue("formcontrolname", "name", "aaa-checkpoint");
+        scraper.WriteAttributeValue("formcontrolname", "description", "This is the description");
+        scraper.ClickTagText("span", " High ");
+        scraper.WriteAttributeValue("formcontrolname", "source", "CIS");
+        scraper.WriteAttributeValue("formcontrolname", "guide", "CIS RHEL 8");
+        scraper.WriteAttributeValue("formcontrolname", "item", "1.6.2");
+        scraper.WriteAttributeValue("formcontrolname", "command", "this is the command");
+        scraper.ClickTagText("span", "Save as");
+        scraper.ClickTagText("button", "Approved");
     }
 }

@@ -1,4 +1,4 @@
-﻿namespace OvelianeEndToEndTests.Browser.OvelianeScraper;
+﻿namespace OvelianeEndToEndTests.Browser;
 
 public sealed class OvelianeScraper
 {
@@ -24,17 +24,19 @@ public sealed class OvelianeScraper
             _scraper.NavigateToPage(_configuration.WebsiteUrl, _configuration.ElementIdToFindInHomePage);
     }
 
-    public OvelianeScraper Click(string id)
-    {
-        if (string.IsNullOrEmpty(id) is not true) _scraper.ClickId(id);
-        return this;
-    }
-
-    public void ClickKeyValue(string key, string value) => _scraper.ClickKeyValue(key, value);
+    public void ClickId(string id) => _scraper.ClickId(id);
+    public void ClickAttributeValue(string attributeName, string attributeValue) => _scraper.ClickAttributeValue(attributeName, attributeValue);
+    public void ClickTagText(string tag, string text) => _scraper.ClickTagText(tag, text);
 
     public OvelianeScraper WriteInId(string id, string word)
     {
-        _scraper.SendKeysToId(id, word);
+        _scraper.WriteToId(id, word);
+        return this;
+    }
+
+    public OvelianeScraper WriteAttributeValue(string attributeName, string attributeValue, string text)
+    {
+        _scraper.WriteAttributeValue(attributeName, attributeValue, text);
         return this;
     }
 
@@ -44,21 +46,16 @@ public sealed class OvelianeScraper
         return this;
     }
 
-    public void NavigateGamePage() => Click(_configuration.ElementIdClickToNavigateGamePage);
+    public void NavigateGamePage() => ClickId(_configuration.ElementIdClickToNavigateGamePage);
 
     public int Play()
     {
         return 1;
     }
 
-    public void Toto()
+    public OvelianeScraper Delay(int delayInMilliseconds)
     {
-        _scraper.ClickFirstXPathWithText("span", "Checkpoints");
-    }
-
-    public OvelianeScraper Delay(int delayInMs)
-    {
-        Thread.Sleep(delayInMs);
+        Thread.Sleep(delayInMilliseconds);
         return this;
     }
 }
