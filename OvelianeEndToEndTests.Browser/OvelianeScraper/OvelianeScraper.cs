@@ -55,4 +55,10 @@ public sealed class OvelianeScraper
     {
         _scraper.ClickFirstXPathWithText("span", "Checkpoints");
     }
+
+    public OvelianeScraper Delay(int delayInMs)
+    {
+        Thread.Sleep(delayInMs);
+        return this;
+    }
 }
