@@ -15,7 +15,6 @@ global using SeleniumExtras.WaitHelpers;
 global using Serilog;
 global using System.Collections.ObjectModel;
 global using System.Diagnostics;
-global using System.Drawing;
 global using System.Xml;
 global using WebDriverManager;
 global using WebDriverManager.DriverConfigs.Impl;

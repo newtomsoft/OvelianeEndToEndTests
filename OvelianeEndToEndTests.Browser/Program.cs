@@ -21,5 +21,4 @@ var host = hostBuilder
 using var serviceScope = host.Services.CreateScope();
 var services = serviceScope.ServiceProvider;
 var application = services.GetRequiredService<EndToEndTestsApplication>();
-
 application.Run();
