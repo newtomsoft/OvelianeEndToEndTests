@@ -7,19 +7,14 @@ public class SeleniumScraper
     private readonly IWebDriver _webDriver;
     private readonly ScreenShotMaker _screenShotMaker;
     private int _errorCount;
+    private IWebElement? _currentWebElement;
 
     public SeleniumScraper(IWebDriverFactory webDriverFactory, ApplicationConfiguration configuration, ILogger<EndToEndTestsApplication> logger)
     {
         _configuration = configuration;
         _logger = logger;
         _webDriver = webDriverFactory.CreateDriver();
-        _screenShotMaker = new ScreenShotMaker();
-    }
-
-    public SeleniumScraper Delay(int delayInMilliseconds)
-    {
-        Thread.Sleep(delayInMilliseconds);
-        return this;
+        _screenShotMaker = new ScreenShotMaker(_logger);
     }
 
     public void NavigateHomePage()
@@ -42,8 +37,8 @@ public class SeleniumScraper
         catch
         {
             _errorCount++;
-            _logger.LogError("Unable to click element with id {id}", id);
-            TakeScreenShot();
+            _logger.LogError("Unable to click elementType with id {id}", id);
+            TakeScreenShot(true);
         }
     }
 
@@ -56,15 +51,15 @@ public class SeleniumScraper
         catch
         {
             _errorCount++;
-            _logger.LogError("Unable to click element with class {className}", className);
-            TakeScreenShot();
+            _logger.LogError("Unable to click elementType with class {className}", className);
+            TakeScreenShot(true);
         }
     }
 
     public void ClickAttributeValue(string attributeName, string attributeValue)
     {
         var element = FindElement(_webDriver, By.CssSelector($"[{attributeName}='{attributeValue}']"), TimeSpan.FromSeconds(10));
-        ClickElement(element!);
+        ClickElement(element);
     }
 
     public void ClickTagText(string tag, string text, bool shouldFail = false)
@@ -76,16 +71,17 @@ public class SeleniumScraper
             ClickElement(element);
             if (!shouldFail) return;
             _errorCount++;
-            _logger.LogError("Click element with tag {tag} and text {text} {status}", tag, text, "should have failed");
+            _logger.LogError("Click elementType with tag {tag} and text {text} {status}", tag, text, "should have failed");
         }
         catch when (shouldFail is false)
         {
             _errorCount++;
-            _logger.LogError("Click element with tag {tag} and text {text} {status}", tag, text, "failed");
-            TakeScreenShot();
+            _logger.LogError("Click elementType with tag {tag} and text {text} {status}", tag, text, "failed");
+            TakeScreenShot(true);
         }
         catch when (shouldFail)
-        { // do nothing
+        {
+            // do nothing
         }
     }
 
@@ -97,9 +93,9 @@ public class SeleniumScraper
         return element is not null;
     }
 
-    private static void ClickElement(IWebElement element)
+    private static void ClickElement(IWebElement? element)
     {
-        if (element is null) throw new ArgumentNullException(nameof(element));
+        if (element is null || IsDisable(element)) throw new Exception(nameof(element));
         try
         {
             element.Click();
@@ -107,6 +103,16 @@ public class SeleniumScraper
         catch
         {
             ClickElement(element.FindElement(By.XPath("./..")));
+        }
+    }
+
+    private static bool IsDisable(IWebElement? element)
+    {
+        while (true)
+        {
+            if (element is null || element.TagName == "html") return false;
+            if (element.Enabled is false) return true;
+            element = element.FindElement(By.XPath("./.."));
         }
     }
 
@@ -132,8 +138,8 @@ public class SeleniumScraper
         catch
         {
             _errorCount++;
-            _logger.LogError("unable to write text {text} in element with attribute {attributeName} and value {attributeValue}", text, attributeName, attributeValue);
-            TakeScreenShot();
+            _logger.LogError("unable to write text {text} in elementType with attribute {attributeName} and value {attributeValue}", text, attributeName, attributeValue);
+            TakeScreenShot(true);
         }
     }
 
@@ -175,10 +181,7 @@ public class SeleniumScraper
                 : FindElement(webDriver, By.ClassName(elementToFindInPage), TimeSpan.FromSeconds(5)) is not null;
     }
 
-    public void TakeScreenShot()
-    {
-        _screenShotMaker.SaveScreenShot(() => ((ITakesScreenshot)_webDriver).GetScreenshot().AsByteArray);
-    }
+    private void TakeScreenShot(bool isError) => _screenShotMaker.SaveScreenShot(() => ((ITakesScreenshot)_webDriver).GetScreenshot().AsByteArray, isError);
 
     private static IWebElement? FindElement(ISearchContext element, By by, TimeSpan timeOut = default)
     {
@@ -214,32 +217,23 @@ public class SeleniumScraper
         return null;
     }
 
-    public void StartTest(string action, string element, string name)
+    public void StartTest(string test, string elementType, string elementName)
     {
         _errorCount = 0;
-        _logger.LogInformation("{action} {element} {name} {status}", action, element, name, "started");
+        _logger.LogInformation("{test} {elementType} \"{elementName}\" {status}", test, elementType, elementName, "started");
     }
 
-    public void EndTest(string action, string element, string name, bool shouldFail = false)
+    public void EndTest(string test, string elementType, string elementName)
     {
-        switch (shouldFail)
-        {
-            case false when _errorCount == 0:
-                _logger.LogInformation("{action} {element} {name} {status}", action, element, name, "success");
-                break;
-            case false when _errorCount > 0:
-                _logger.LogError("{action} {element} {name} {status}", action, element, name, "failed");
-                break;
-            case true when _errorCount == 0:
-                _logger.LogError("{action} {element} {name} {status}", action, element, name, "failed");
-                break;
-            case true when _errorCount > 0:
-                _logger.LogInformation("{action} {element} {name} {status}", action, element, name, "success");
-                break;
-        }
+        Thread.Sleep(800);
+        TakeScreenShot(_errorCount > 0);
+        if (_errorCount == 0)
+            _logger.LogInformation("{test} {elementType} \"{elementName}\" {status}", test, elementType, elementName, "success");
+        else
+            _logger.LogError("{test} {elementType} \"{elementName}\" {status}", test, elementType, elementName, "failed");
     }
 
-    public void CheckTagTextExist(string tag, string text, bool shouldFail = false)
+    public SeleniumScraper CheckTagTextExist(string tag, string text, bool shouldFail = false)
     {
         var element = FindElement(_webDriver, By.XPath($"//{tag}[text()='{text}']"), TimeSpan.FromSeconds(1)) ??
                       FindElement(_webDriver, By.XPath($"//{tag}[contains(text(),'{text}')]"), TimeSpan.FromSeconds(1));
@@ -248,24 +242,42 @@ public class SeleniumScraper
         {
             case false when element is null:
                 _errorCount++;
-                _logger.LogError("element with tag {tag} and text {text} not found", tag, text);
+                _logger.LogError("elementType with tag {tag} and text {text} not found", tag, text);
                 break;
             case true when element is null:
             case false:
                 break;
             case true:
                 _errorCount++;
-                _logger.LogError("element with tag {tag} and text {text} found", tag, text);
+                _logger.LogError("elementType with tag {tag} and text {text} found", tag, text);
                 break;
         }
+
+        _currentWebElement = element;
+        return this;
     }
-
-
-
 
     public void CloseScraper()
     {
         _webDriver.Close();
         _webDriver.Quit();
     }
+
+    public SeleniumScraper ThenSelectRow()
+    {
+        while (true)
+        {
+            if (_currentWebElement is null || _currentWebElement.TagName == "mat-row") return this;
+            _currentWebElement = _currentWebElement!.FindElement(By.XPath("./.."));
+        }
+    }
+
+    public SeleniumScraper ThenClickClass(string className)
+    {
+        if (_currentWebElement is null) return this;
+        _currentWebElement!.FindElement(By.ClassName(className)).Click();
+        return this;
+    }
+
+    public void CompareScreenShots() => _screenShotMaker.CompareScreenShots();
 }
