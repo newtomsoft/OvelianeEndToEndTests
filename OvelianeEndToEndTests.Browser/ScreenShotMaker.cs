@@ -8,7 +8,7 @@ public class ScreenShotMaker
 {
     private readonly ILogger<EndToEndTestsApplication> _logger;
     private readonly string _pathToScreenShots;
-
+    private const string ErrorPrefix = "Error_";
     public ScreenShotMaker(ILogger<EndToEndTestsApplication> logger)
     {
         _logger = logger;
@@ -37,7 +37,7 @@ public class ScreenShotMaker
     private void SaveImage(Image screenShotImage, bool isError)
     {
         var imagePrefixName = $"{DateTime.Now:HH-mm-ss}_{ImagePrefixName()}";
-        if (isError) imagePrefixName = $"ERROR_{imagePrefixName}";
+        if (isError) imagePrefixName = $"{ErrorPrefix}{imagePrefixName}";
         var screenShotFilename = Path.Combine(_pathToScreenShots, imagePrefixName + ".png");
         screenShotImage.Save(screenShotFilename);
     }
@@ -74,22 +74,26 @@ public class ScreenShotMaker
         var goldenMasterFiles = directoryGoldenMaster.GetFiles();
         var noteSameCount = 0;
         var md5 = MD5.Create();
-        foreach (var file in directoryScreenShots.GetFiles("*.png").Where(name => name.Name.Contains("ERROR") is false))
+        foreach (var file in directoryScreenShots.GetFiles("*.png").Where(name => name.Name.Contains(ErrorPrefix) is false))
         {
             using var streamFile = file.OpenRead();
             var fileMd5 = md5.ComputeHash(streamFile);
-            var masterFileName = file.Name[9..];
-            var masterFile = goldenMasterFiles.FirstOrDefault(x => x.Name == masterFileName);
-            if (masterFile is null)
+            streamFile.Close();
+            streamFile.Dispose();
+            var goldenMasterFileName = file.Name[9..];
+            var goldenMasterFile = goldenMasterFiles.FirstOrDefault(x => x.Name == goldenMasterFileName);
+            if (goldenMasterFile is null)
             {
                 _logger.LogWarning("The file {fileName} has no golden master", file.Name);
+                file.MoveTo(Path.Combine(file.DirectoryName!, $"MissingGolden_{file.Name}"));
                 continue;
             }
-            using var streamGoldenMaster = masterFile.OpenRead();
+            using var streamGoldenMaster = goldenMasterFile.OpenRead();
             var masterFileMd5 = md5.ComputeHash(streamGoldenMaster);
             if (fileMd5.SequenceEqual(masterFileMd5)) continue;
             noteSameCount++;
             _logger.LogWarning("The screenShot {fileName} is different from the golden master", file.Name);
+            file.MoveTo(Path.Combine(file.DirectoryName!, $"NotSameGolden_{file.Name}"));
         }
         if (noteSameCount == 0)
             _logger.LogInformation("All screenShots are the same as their golden master");
